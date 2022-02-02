@@ -1,0 +1,7 @@
+1. MPBOOTPHYS is used to map a virtual address to a physical address. It is necessary to have in kern/mpentry.S because it is loaded at a higher address and then loaded at a lower address by boot_aps(). Without it, we cannot load the code to its correct load position.
+
+2. We still need separate kerenel stacks because we cannot guarantee that there won't be any conflicts in the stack. If we have a shared kernel stack, processes will push a trap frame while entering the kernel and when it leave the trop frame will be popped. But if another process is entered during that then that process's trapframe will be popped into the an environment that is not is own.
+
+3. Pointer e can be dereferenced both before and after the addressing switch because e points to the kernel address so we know that the address will be the same in the kernel and user level.
+
+4. This occurs in the trap frame when we are switching from user mode to kernel mode. This process is used to help save the current trap frame.

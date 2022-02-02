@@ -1,0 +1,7 @@
+1. The purpose of having an individual handler function for each exception/interrupt is so that we can assign different permissions for different handlers or for kernel and user programs.
+
+2. I didn't have to do anything to make the user/softint program behave correctly. int $14 should produce vector 13 because the DPL for page fault handler is given kernel priviledges. Because it's in ring 0 and not 3, when the user is calling int $14, the CPU will produce interrupt vector 13 by triggering the general protection fault.
+
+3. A break point point exception or a general protection fault is generated because the the DPL is set to 0 or the kernel level. Thus, a protection error will occur when it's being accessed by the user (it won't let it happen for the user). The protection error will disappear if you set the DPL to 3 or user level.
+
+4. These mechanisms help protect the kernel from interference on the user level.

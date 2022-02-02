@@ -1,0 +1,34 @@
+Question 1:
+x is of type uintptr_t.
+x is set to a pointer, value, and value is a virtual address because it is dereferenced.
+
+Question 2:
+Entry   Base Virtual Address   Points to (logically)
+1023    0xf0000000             Page table for top 4MB of phys memory
+1022    0xefc00000             Memory-mapped I/O (MMIOLIM)
+.       0xef800000             Memory-mapped I/O (ULIM, MMIOBASE)
+.       0xef400000             Current User Read-only Page Table (User R-) (UVPT)
+.       0xef000000             RO PAGES or read-only copies of the Page structures (UPAGES)
+.       0xeec00000             RO ENVS or read-only copies of the global env structures (UTOP, UENVS, UXSTACKTOP)
+.       0xeebff000             User exception stack             
+.       0xeebfe000             Empty Memory (*) or top of normal user stack (USTACKTOP)
+.       0xeebfd000             Normal user stack
+2       0x00800000             Program Data & Heap (UTEXT)
+1       0x00400000             Empty Memory (*) where JOS user programs map pages temporarily (UTEMP)
+
+Question 3:
+To protect the kernel memory, we set certain permissions. This allows us to prevent user programs from reading or writing the kernel's memory. There are 4 levels of memory privilege:
+0 - highest, OS kernel
+1 - OS kernel
+2 - highest user-level privilege
+3 - user-level privilege
+Typically, 0 is for kernel, 3 is for user. The current privilege level can only move down the levels (from 0 to  3) so because user-level privilege is at ring 3, it can't access the kernel since it's at ring 0 which is at a higher level. We also have permission bits/flags of PDE/PTE are used to protect the kernel memory.
+
+Question 4:
+The maximum amount of physical memory that this operating system can support is 256MB because the physical memory is starting at virtual address 0xf0000000 and thus this would only allow up to 256MB of physical memory (max virtual address is 0xfffff).
+
+Question 5:
+The amount of space overhead is a little over 6MB or 6MB + 4KB of space to be more exact. struct PageInfo has 4MB and a pgdir is 4096 bytes or 4KB. We then need about 2GB/4MB = 512 page tables which takes 512 * 4KB = 2MB. So in total the amount of space would be: 4MB + 4KB + 2MB = 6MB + 4KB which is a littl eover 6MB.
+
+Question 6:
+The instruction jmp *%eax allows us to transition to running at an EIP above KERNBASE. The virtual address is mapped to the physical address which makes it possible for us to continue executing at a low EIP between when we enable paging and when we begin runnign at an EIP above KERNBASE. This transition is necessary because the region we mapped to is critical for a few instructions in entry.S and then we never use it again. 
